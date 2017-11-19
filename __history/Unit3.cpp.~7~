@@ -1,0 +1,667 @@
+//---------------------------------------------------------------------------
+ #include <time.h>
+#include <vcl.h>
+#include      <ComObj.hpp>
+#include      <utilcls.h>
+#pragma hdrstop
+
+#include "Unit1.h"
+#include "Unit3.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TForm3 *Form3;
+
+
+//---------------------------------------------------------------------------
+__fastcall TForm3::TForm3(TComponent* Owner)
+	: TForm(Owner)
+{
+StringGrid2->Cells[0][0]=  "Фамилия";
+StringGrid2->Cells[0][1]=  "Имя";
+StringGrid2->Cells[0][2]=  "Отчество";
+StringGrid2->Cells[0][3]=  "Дата рождения";
+StringGrid2->Cells[0][4]=  "Год рождения";
+StringGrid2->Cells[0][5]=  "Кафедра";
+StringGrid2->Cells[0][6]=  "Факультет";
+StringGrid2->Cells[0][7]=  "Должность";
+StringGrid2->Cells[0][8]=  "Рабочий телефон";
+StringGrid2->Cells[0][9]=  "Мобильный телефон";
+StringGrid2->Cells[0][10]=  "Электронный адрес";
+StringGrid2->Cells[0][11]=  "Дополнительная информация";
+StringGrid2->Cells[0][12]=  "Ученая степень";
+StringGrid2->Cells[0][13]=  "Год присуждения ученой степени";
+StringGrid2->Cells[0][14]=  "Ученое звание";
+StringGrid2->Cells[0][15]=  "Год присуждения ученого звания";
+StringGrid2->Cells[0][16]=  "Специальность диссертации";
+StringGrid2->Cells[0][17]=  "Шифр специальности диссертации";
+StringGrid2->Cells[0][18]=  "Тема диссертации";
+StringGrid2->Cells[0][19]=  "Ключевые слова по теме";
+StringGrid2->Cells[0][20]=  "Год поступления в аспирантуру";
+StringGrid2->Cells[0][21]=  "Год окончания аспирантуры";
+StringGrid2->Cells[0][22]=  "Место обучения в аспирантуре";
+StringGrid2->Cells[0][23]=  "Научные направления (интересы)";
+StringGrid2->Cells[0][24]=  "Количество научных статей";
+StringGrid2->Cells[0][25]=  "Количество материалов по результатам конференций";
+StringGrid2->Cells[0][26]=  "Количество монографий";
+StringGrid2->Cells[0][27]=  "Количество учебников и методических справочников";
+StringGrid2->Cells[0][28]=  "Наличие патентов или другой интеллектуальной собственности";
+StringGrid2->Cells[0][29]=  "Научные темы, в которых принимает участие";
+StringGrid2->Cells[0][30]=  "Участие в общих разработках с другими организациями";
+StringGrid2->Cells[0][31]=  "Награды и именные стипендии";
+StringGrid2->Cells[0][32]=  "Участие в грантовых программах";
+StringGrid2->Cells[0][33]=  "Членство в научных профсоюзах и организациях";
+
+
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->Active = true;
+
+Button1->Enabled=false;
+}
+
+
+//---------------------------------------------------------------------------
+ void __fastcall TForm3::Button5Click(TObject *Sender)
+{
+
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->SQL->Add("WHERE Фамилия = :s1 OR Имя = :s2 OR Отчество = :s3");
+ADOQuery1->Parameters->ParamByName("s1")->Value = Edit1->Text;
+ADOQuery1->Parameters->ParamByName("s2")->Value = Edit2->Text;
+ADOQuery1->Parameters->ParamByName("s3")->Value = Edit3->Text;
+ADOQuery1->Active = true;
+
+}
+//---------------------------------------------------------------------------
+ void __fastcall TForm3::Button7Click(TObject *Sender)
+{
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->SQL->Add("WHERE Фамилия = :s1 AND Имя = :s2 AND Отчество = :s3");
+ADOQuery1->Parameters->ParamByName("s1")->Value = Edit1->Text;
+ADOQuery1->Parameters->ParamByName("s2")->Value = Edit2->Text;
+ADOQuery1->Parameters->ParamByName("s3")->Value = Edit3->Text;
+ADOQuery1->Active = true;
+}
+
+
+void __fastcall TForm3::Button6Click(TObject *Sender)
+{
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->Active = true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm3::DBGrid1CellClick(TColumn *Column)    //Заполение грида
+{
+TLocateOptions loCaseInsensitive; // Создается поиск
+loCaseInsensitive.Clear();  // Отмена предидущего поиска
+Form1->ADOTableMain->Locate("Код ученого",ADOQuery1->FieldByName("Код ученого")->AsString.c_str(),loCaseInsensitive);
+
+Button1->Enabled=true;
+
+
+Variant LookupFacC1 = Form1->ADOTableDept->Lookup("Код кафедры",Form1->ADOTableMain->FieldByName("Кафедра")->AsString.c_str(),"Факультет");
+Variant LookupDeptC = Form1->ADOTableDept->Lookup("Код кафедры",Form1->ADOTableMain->FieldByName("Кафедра")->AsString.c_str(),"Название кафедры");
+Variant LookupFacC = Form1->ADOTableFac->Lookup("Код факультета",LookupFacC1,"Название факультета");
+Variant LookupDolshn = Form1->ADOTablePosts->Lookup("Код должности",Form1->ADOTableMain->FieldByName("Должность")->AsString.c_str(),"Должность");
+
+StringGrid2->Cells[1][0]=  Form1->ADOTableMain->FieldByName("Фамилия")->AsString.c_str();
+StringGrid2->Cells[1][1]=  Form1->ADOTableMain->FieldByName("Имя")->AsString.c_str();
+StringGrid2->Cells[1][2]=  Form1->ADOTableMain->FieldByName("Отчество")->AsString.c_str();
+StringGrid2->Cells[1][3]=  Form1->ADOTableMain->FieldByName("Дата рождения")->AsString.c_str();
+StringGrid2->Cells[1][4]=  Form1->ADOTableMain->FieldByName("Год рождения")->AsString.c_str();
+StringGrid2->Cells[1][5]=  LookupDeptC ;
+StringGrid2->Cells[1][6]=  LookupFacC;
+StringGrid2->Cells[1][7]=  LookupDolshn;
+StringGrid2->Cells[1][8]=  Form1->ADOTableMain->FieldByName("Рабочий телефон")->AsString.c_str();
+StringGrid2->Cells[1][9]=  Form1->ADOTableMain->FieldByName("Мобильный телефон")->AsString.c_str();
+StringGrid2->Cells[1][10]=  Form1->ADOTableMain->FieldByName("Электронный адрес")->AsString.c_str();
+StringGrid2->Cells[1][11]=  Form1->ADOTableMain->FieldByName("Дополнительная информация")->AsString.c_str();
+
+
+loCaseInsensitive.Clear();
+loCaseInsensitive<< loPartialKey;
+Form1->ADOTableInf->Locate("Код ученого", Form1->ADOTableMain->FieldByName("Код ученого")->AsString.c_str(), loCaseInsensitive);
+
+Variant LookupSpeC = Form1->ADOTableSpeciality->Lookup("Код специальности",Form1->ADOTableInf->FieldByName("Специальность диссертации")->AsString.c_str(),"Шифр");
+Variant LookupSpeC1 = Form1->ADOTableSpeciality->Lookup("Код специальности",Form1->ADOTableInf->FieldByName("Специальность диссертации")->AsString.c_str(),"Название");
+Variant LookupRank = Form1->ADOTableRanks->Lookup("Код звания",Form1->ADOTableInf->FieldByName("Ученое звание")->AsString.c_str(),"Звание");
+Variant LookupDeg = Form1->ADOTableDeg->Lookup("Код степени",Form1->ADOTableInf->FieldByName("Ученая степень")->AsString.c_str(),"Ученые степени");
+
+StringGrid2->Cells[1][12]=  LookupDeg;
+StringGrid2->Cells[1][13]=  Form1->ADOTableInf->FieldByName("Год присуждения ученой степени")->AsString.c_str();
+StringGrid2->Cells[1][14]=  LookupRank ;
+StringGrid2->Cells[1][15]=  Form1->ADOTableInf->FieldByName("Год присуждения ученого звания")->AsString.c_str();
+StringGrid2->Cells[1][16]=  LookupSpeC1;
+StringGrid2->Cells[1][17]=  LookupSpeC;
+StringGrid2->Cells[1][18]=  Form1->ADOTableInf->FieldByName("Тема диссертации")->AsString.c_str();
+StringGrid2->Cells[1][19]=  Form1->ADOTableInf->FieldByName("Ключевые слова по теме")->AsString.c_str();
+StringGrid2->Cells[1][20]=  Form1->ADOTableInf->FieldByName("Год поступления в аспирантуру")->AsString.c_str();
+StringGrid2->Cells[1][21]=  Form1->ADOTableInf->FieldByName("Год окончания аспирантуры")->AsString.c_str();
+StringGrid2->Cells[1][22]=  Form1->ADOTableInf->FieldByName("Место обучения в аспирантуре")->AsString.c_str();
+StringGrid2->Cells[1][23]=  Form1->ADOTableInf->FieldByName("Научное направление (научные интересы)")->AsString.c_str();
+
+
+loCaseInsensitive.Clear();
+loCaseInsensitive<< loPartialKey;
+Form1->ADOTableWork->Locate("Код ученого", Form1->ADOTableMain->FieldByName("Код ученого")->AsString.c_str(), loCaseInsensitive);
+
+StringGrid2->Cells[1][24]=  Form1->ADOTableWork->FieldByName("Количество научных статей")->AsString.c_str();
+StringGrid2->Cells[1][25]=  Form1->ADOTableWork->FieldByName("Количество материалов по результатам конференций")->AsString.c_str();
+StringGrid2->Cells[1][26]=  Form1->ADOTableWork->FieldByName("Количество монографий")->AsString.c_str();
+StringGrid2->Cells[1][27]=  Form1->ADOTableWork->FieldByName("Количество учебников и методических справочников")->AsString.c_str();
+StringGrid2->Cells[1][28]=  Form1->ADOTableWork->FieldByName("Наличие патентов или другой интеллектуальной собственности")->AsString.c_str();
+StringGrid2->Cells[1][29]=  Form1->ADOTableWork->FieldByName("Научные темы, в которых принимает участие")->AsString.c_str();
+StringGrid2->Cells[1][30]=  Form1->ADOTableWork->FieldByName("Участие в общих разработках с другими организациями")->AsString.c_str();
+StringGrid2->Cells[1][31]=  Form1->ADOTableWork->FieldByName("Награды и именные стипендии")->AsString.c_str();
+StringGrid2->Cells[1][32]=  Form1->ADOTableWork->FieldByName("Участие в грантовых программах")->AsString.c_str();
+StringGrid2->Cells[1][33]=  Form1->ADOTableWork->FieldByName("Членство в научных профсоюзах и организациях")->AsString.c_str();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button2Click(TObject *Sender)
+{
+  if (Application->MessageBox("Вы действительно хотите удалить запись? Восстановление будет невозможно. \n\n","Удаление записи.",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+int start = clock();
+Form1->ADOTableMain->Delete();
+for (int i = 0; i < 35; i++) {
+ StringGrid2->Cells[1][i]= "";
+}
+
+  int 	end = clock();
+		 ShowMessage((end-start));
+ShowMessage("Удалено!");
+}
+
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->Active = true;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button3Click(TObject *Sender)
+{
+  OpenDialog1->Execute();   // Выбор документа Excel
+	 AnsiString exname = OpenDialog1->FileName;
+
+  int x,y;
+  Variant Excel;    //    Создание объекта Excel
+
+		Excel=CreateOleObject("Excel.Application");
+		Excel.OlePropertySet("Visible", false);
+
+	  Excel.OlePropertyGet("WorkBooks").OleProcedure("Open", exname.c_str());
+	  Excel.OlePropertyGet("Sheets","Лист1").OleProcedure("Select");
+
+
+Variant vVarSheet = Excel.OlePropertyGet("ActiveSheet");
+
+
+
+		  for(y=1;y<=35;y++)  //Перенос значения
+		 StringGrid2->Cells[1][y]=Excel.OlePropertyGet("Cells",y+1,2);
+
+
+
+			  Excel.OleProcedure("Quit");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button4Click(TObject *Sender)
+{
+		//-------------------------------Все ли поля заполнены--------------------------------------------
+					  for(int i = 0 ; i<StringGrid2->RowCount ;++i)
+		{
+		for(int j = 0; j< StringGrid2->ColCount;++j)
+		if (StringGrid2->Cells[j][i]=="")  {
+			MessageDlg("Необходимо заполнить все поля", mtError, TMsgDlgButtons() <<mbOK, 0);
+			return;
+		}
+		}
+		//---------------------------------------------------------------------------
+
+		//--------------------------------Есть ли такая запись-------------------------------------------
+		ADOQuery2->Active = false;
+		ADOQuery2->SQL->Clear();
+		ADOQuery2->SQL->Add("SELECT *FROM [Основная информация] WHERE Фамилия = :s1 AND Имя = :s2 AND Отчество = :s3");
+		ADOQuery2->Parameters->ParamByName("s1")->Value = StringGrid2->Cells[1][0];
+		ADOQuery2->Parameters->ParamByName("s2")->Value = StringGrid2->Cells[1][1];
+		ADOQuery2->Parameters->ParamByName("s3")->Value = StringGrid2->Cells[1][2];
+		ADOQuery2->Active = true;
+
+			if (ADOQuery2->RecordCount>0)
+				 if (Application->MessageBox("Возможно, такая запись уже существует. Вce равно добавить? \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+				{
+					Abort();
+				}
+		//---------------------------------------------------------------------------
+
+		//------------------------------Нужно ли добавлять новую специальность---------------------------------------------
+
+		Variant LookupSpec;
+		Variant LookupSpec1;
+
+		LookupSpec = Form1->ADOTableSpeciality->Lookup("Шифр",StringGrid2->Cells[1][17],"Код специальности");
+		LookupSpec1 = Form1->ADOTableSpeciality->Lookup("Название",StringGrid2->Cells[1][16],"Код специальности");
+
+			if ( (LookupSpec.IsNull()) || (LookupSpec1.IsNull()) || (LookupSpec!=LookupSpec1)) {
+
+				if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Специальности'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+				 {
+					Abort();
+				 }
+
+			else {
+
+				Form1->ADOTableSpeciality->Insert();
+				Form1->ADOTableSpeciality->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][16];
+				Form1->ADOTableSpeciality->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][17];
+				Form1->ADOTableSpeciality->Post();
+				ShowMessage("Добавлено.");
+
+				LookupSpec = Form1->ADOTableSpeciality->Lookup("Шифр",StringGrid2->Cells[1][17],"Код специальности");
+				}
+
+		}
+
+		//---------------------------------------------------------------------------
+
+		//---------------------------Нужно ли добавлять факультет и кафедру------------------------------------------------
+   Variant LookupDept;
+   Variant LookupDept1;
+   Variant LookupFac;
+
+
+	LookupFac = Form1->ADOTableFac->Lookup("Название факультета",StringGrid2->Cells[1][6],"Код факультета");
+
+	  if (LookupFac.IsNull())  {
+
+	  if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Факультеты'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+
+	Form1->ADOTableFac->Insert();
+
+		Form1->ADOTableFac->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][6];
+
+	Form1->ADOTableFac->Post();
+	ShowMessage("Добавлено.");
+	LookupFac = Form1->ADOTableFac->Lookup("Название факультета",StringGrid2->Cells[1][6],"Код факультета");
+}
+   }
+
+
+	 LookupDept1 = Form1->ADOTableDept->Lookup("Название кафедры",StringGrid2->Cells[1][5],"Код кафедры");
+
+
+	   if (LookupDept1.IsNull()) {
+
+
+		if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Кафедры'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+
+	Form1->ADOTableDept->Insert();
+
+		Form1->ADOTableDept->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][5];
+		Form1->ADOTableDept->Fields->FieldByNumber(3)->AsString = LookupFac;
+
+	Form1->ADOTableDept->Post();
+	ShowMessage("Добавлено.");
+
+	int j=1;
+	int keyD=0;
+	LookupDept1 = Form1->ADOTableDept->Lookup("Факультет",LookupFac,"Код кафедры");
+
+	 do{
+		Form1->ADOTableDept->RecNo = j;
+		if (Form1->ADOTableDept->Fields->FieldByNumber(2)->AsString==StringGrid2->Cells[1][5]) {
+		  keyD =  Form1->ADOTableDept->Fields->FieldByNumber(1)->AsInteger;
+		}
+	  j++;
+
+	 } while (LookupDept!=keyD);
+
+}
+
+		}
+
+
+   //---------------------------------------------------------------------------
+
+   //---------------------Проверка должности------------------------------------------------------
+
+   Variant LookupPost;
+   Variant LookupRank;
+   Variant LookupDeg;
+
+	LookupPost = Form1->ADOTablePosts->Lookup("Должность",StringGrid2->Cells[1][7],"Код должности");
+	LookupRank = Form1->ADOTableRanks->Lookup("Звание",StringGrid2->Cells[1][14],"Код звания");
+	LookupDeg = Form1->ADOTableDeg->Lookup("Ученые степени",StringGrid2->Cells[1][12],"Код степени");
+
+	  if ((!LookupPost.IsNull())||(!LookupRank.IsNull())||(!LookupDeg.IsNull()))
+		  {
+
+
+			 //---------------------------------------------------------------------------
+		Form1->ADOTableMain->Insert();
+
+		Form1->ADOTableMain->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][0];  //Фамилия
+		Form1->ADOTableMain->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][1];  // Имя
+		Form1->ADOTableMain->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][2];   // Отчество
+		Form1->ADOTableMain->Fields->FieldByNumber(5)->AsString = StringGrid2->Cells[1][3];  //
+		Form1->ADOTableMain->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][4];   //
+		Form1->ADOTableMain->Fields->FieldByNumber(7)->AsString = LookupDept1;
+		Form1->ADOTableMain->Fields->FieldByNumber(8)->AsString = LookupPost;                  //
+		Form1->ADOTableMain->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][8];    //
+		Form1->ADOTableMain->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][9];    //
+		Form1->ADOTableMain->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][10];   //
+		Form1->ADOTableMain->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][11];   //
+
+		Form1->ADOTableMain->Post();
+
+		Form1->ADOTableMain->RecNo = Form1->ADOTableMain->RecordCount;
+		int key =  Form1->ADOTableMain->Fields->FieldByNumber(1)->AsInteger;
+
+
+		Form1->ADOTableWork->Insert();
+		Form1->ADOTableWork->Fields->FieldByNumber(2)->AsString = key;
+		Form1->ADOTableWork->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][24];
+		Form1->ADOTableWork->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][25];
+		Form1->ADOTableWork->Fields->FieldByNumber(5)->AsString = StringGrid2->Cells[1][26];
+		Form1->ADOTableWork->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][27];
+		Form1->ADOTableWork->Fields->FieldByNumber(7)->AsString = StringGrid2->Cells[1][28];
+		Form1->ADOTableWork->Fields->FieldByNumber(8)->AsString = StringGrid2->Cells[1][29];
+		Form1->ADOTableWork->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][30];
+		Form1->ADOTableWork->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][31];
+		Form1->ADOTableWork->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][32];
+		Form1->ADOTableWork->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][33];
+		Form1->ADOTableWork->Post();
+
+
+
+		  Form1->ADOTableInf->Insert();
+		Form1->ADOTableInf->Fields->FieldByNumber(2)->AsString = key;
+		Form1->ADOTableInf->Fields->FieldByNumber(3)->AsString = LookupDeg;
+		Form1->ADOTableInf->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][13];
+		Form1->ADOTableInf->Fields->FieldByNumber(5)->AsString = LookupRank;
+		Form1->ADOTableInf->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][15];
+		Form1->ADOTableInf->Fields->FieldByNumber(7)->AsString = LookupSpec;
+		Form1->ADOTableInf->Fields->FieldByNumber(8)->AsString = StringGrid2->Cells[1][18];
+		Form1->ADOTableInf->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][19];
+		Form1->ADOTableInf->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][20];
+		Form1->ADOTableInf->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][21];
+		Form1->ADOTableInf->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][22];
+		Form1->ADOTableInf->Fields->FieldByNumber(13)->AsString = StringGrid2->Cells[1][23];
+		Form1->ADOTableInf->Post();
+
+             ShowMessage("Добалено успешно!");
+				   //---------------------------------------------------------------------------
+
+
+		//Add all
+
+
+
+ }
+
+		else { ShowMessage("Необходимо проверить данные в полях: 'Должность', 'Звание', 'Ученая степень'."); }
+
+		//----------------------------Обновление грида-----------------------------------------------
+		ADOQuery1->Active = false;
+		ADOQuery1->SQL->Clear();
+		ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+		ADOQuery1->SQL->Add("FROM [Основная информация]");
+		ADOQuery1->Active = true;
+		//---------------------------------------------------------------------------
+}
+//---------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button1Click(TObject *Sender)
+{
+
+				  for(int i = 0 ; i<StringGrid2->RowCount ;++i)
+{
+for(int j = 0; j< StringGrid2->ColCount;++j)
+ if (StringGrid2->Cells[j][i]=="")  {
+			MessageDlg("Необходимо заполнить все поля", mtError, TMsgDlgButtons() <<mbOK, 0);
+			return;
+		}
+ }
+	////////////////////////////////Spec///////////////////////////////////////////////////
+			// 1
+   Variant LookupSpec;
+   Variant LookupSpec1;
+
+	LookupSpec = Form1->ADOTableSpeciality->Lookup("Шифр",StringGrid2->Cells[1][17],"Код специальности");
+	LookupSpec1 = Form1->ADOTableSpeciality->Lookup("Название",StringGrid2->Cells[1][16],"Код специальности");
+
+	if ((LookupSpec.IsNull())||(LookupSpec1.IsNull())||(LookupSpec!=LookupSpec1))
+
+	{
+
+	 if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Специальности'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+
+	Form1->ADOTableSpeciality->Insert();
+
+		Form1->ADOTableSpeciality->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][16];
+		Form1->ADOTableSpeciality->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][17];
+
+	Form1->ADOTableSpeciality->Post();
+	ShowMessage("Добавлено.");
+
+   LookupSpec = Form1->ADOTableSpeciality->Lookup("Шифр",StringGrid2->Cells[1][17],"Код специальности");
+
+	}
+
+ }
+
+////////////////////////////////Spec///////////////////////////////////////////////////
+   Variant LookupDept;
+   Variant LookupDept1;
+   Variant LookupFac;
+
+
+	LookupFac = Form1->ADOTableFac->Lookup("Название факультета",StringGrid2->Cells[1][6],"Код факультета");
+
+	  if (LookupFac.IsNull())  {
+
+	  if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Факультеты'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+
+	Form1->ADOTableFac->Insert();
+
+		Form1->ADOTableFac->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][6];
+
+	Form1->ADOTableFac->Post();
+	ShowMessage("Добавлено.");
+	LookupFac = Form1->ADOTableFac->Lookup("Название факультета",StringGrid2->Cells[1][6],"Код факультета");
+}
+   }
+
+
+	 LookupDept1 = Form1->ADOTableDept->Lookup("Название кафедры",StringGrid2->Cells[1][5],"Код кафедры");
+
+
+		if (LookupDept1.IsNull())  {
+
+
+		if (Application->MessageBox("Будет добавлена новая запись в таблицу 'Кафедры'. \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+{
+
+	Form1->ADOTableDept->Insert();
+
+		Form1->ADOTableDept->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][5];
+		Form1->ADOTableDept->Fields->FieldByNumber(3)->AsString = LookupFac;
+
+	Form1->ADOTableDept->Post();
+	ShowMessage("Добавлено.");
+
+	LookupDept1 = Form1->ADOTableDept->Lookup("Название кафедры",StringGrid2->Cells[1][5],"Код кафедры");
+}
+
+		}
+
+
+
+
+   Variant LookupPost;
+   Variant LookupRank;
+   Variant LookupDeg;
+
+	LookupPost = Form1->ADOTablePosts->Lookup("Должность",StringGrid2->Cells[1][7],"Код должности");
+	LookupRank = Form1->ADOTableRanks->Lookup("Звание",StringGrid2->Cells[1][14],"Код звания");
+	LookupDeg = Form1->ADOTableDeg->Lookup("Ученые степени",StringGrid2->Cells[1][12],"Код степени");
+
+	  if ((!LookupPost.IsNull())||(!LookupRank.IsNull())||(!LookupDeg.IsNull()))
+		  {
+
+
+
+		Form1->ADOTableMain->Edit();
+
+		Form1->ADOTableMain->Fields->FieldByNumber(2)->AsString = StringGrid2->Cells[1][0];  //Фамилия
+		Form1->ADOTableMain->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][1];  // Имя
+		Form1->ADOTableMain->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][2];   // Отчество
+		Form1->ADOTableMain->Fields->FieldByNumber(5)->AsString = StringGrid2->Cells[1][3];  //
+		Form1->ADOTableMain->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][4];   //
+		Form1->ADOTableMain->Fields->FieldByNumber(7)->AsString = LookupDept1;                 //
+		Form1->ADOTableMain->Fields->FieldByNumber(8)->AsString = LookupPost;                  //
+		Form1->ADOTableMain->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][8];    //
+		Form1->ADOTableMain->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][9];    //
+		Form1->ADOTableMain->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][10];   //
+		Form1->ADOTableMain->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][11];   //
+
+		Form1->ADOTableMain->Post();
+
+		Form1->ADOTableMain->RecNo = Form1->ADOTableMain->RecordCount;
+		int key =  Form1->ADOTableMain->Fields->FieldByNumber(1)->AsInteger;
+
+
+		Form1->ADOTableWork->Edit();
+		Form1->ADOTableWork->Fields->FieldByNumber(2)->AsString = key;
+		Form1->ADOTableWork->Fields->FieldByNumber(3)->AsString = StringGrid2->Cells[1][24];
+		Form1->ADOTableWork->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][25];
+		Form1->ADOTableWork->Fields->FieldByNumber(5)->AsString = StringGrid2->Cells[1][26];
+		Form1->ADOTableWork->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][27];
+		Form1->ADOTableWork->Fields->FieldByNumber(7)->AsString = StringGrid2->Cells[1][28];
+		Form1->ADOTableWork->Fields->FieldByNumber(8)->AsString = StringGrid2->Cells[1][29];
+		Form1->ADOTableWork->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][30];
+		Form1->ADOTableWork->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][31];
+		Form1->ADOTableWork->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][32];
+		Form1->ADOTableWork->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][33];
+		Form1->ADOTableWork->Post();
+
+
+
+		  Form1->ADOTableInf->Edit();
+		Form1->ADOTableInf->Fields->FieldByNumber(2)->AsString = key;
+		Form1->ADOTableInf->Fields->FieldByNumber(3)->AsString = LookupDeg;
+		Form1->ADOTableInf->Fields->FieldByNumber(4)->AsString = StringGrid2->Cells[1][13];
+		Form1->ADOTableInf->Fields->FieldByNumber(5)->AsString = LookupRank;
+		Form1->ADOTableInf->Fields->FieldByNumber(6)->AsString = StringGrid2->Cells[1][15];
+		Form1->ADOTableInf->Fields->FieldByNumber(7)->AsString = LookupSpec;
+		Form1->ADOTableInf->Fields->FieldByNumber(8)->AsString = StringGrid2->Cells[1][18];
+		Form1->ADOTableInf->Fields->FieldByNumber(9)->AsString = StringGrid2->Cells[1][19];
+		Form1->ADOTableInf->Fields->FieldByNumber(10)->AsString = StringGrid2->Cells[1][20];
+		Form1->ADOTableInf->Fields->FieldByNumber(11)->AsString = StringGrid2->Cells[1][21];
+		Form1->ADOTableInf->Fields->FieldByNumber(12)->AsString = StringGrid2->Cells[1][22];
+		Form1->ADOTableInf->Fields->FieldByNumber(13)->AsString = StringGrid2->Cells[1][23];
+		Form1->ADOTableInf->Post();
+
+		 ShowMessage("Сохранено успешно!");
+
+
+
+		//Add all
+
+
+
+ }
+
+
+	 else
+{
+	  ShowMessage("Необходимо проверить данные в полях: 'Должность', 'Звание', 'Ученая степень'.");
+}
+
+ADOQuery1->Active = false;
+ADOQuery1->SQL->Clear();
+ADOQuery1->SQL->Add("SELECT [Код ученого], Фамилия, Имя, Отчество, [Дата рождения], Кафедра, Должность,[Мобильный телефон],[Электронный адрес]");
+ADOQuery1->SQL->Add("FROM [Основная информация]");
+ADOQuery1->Active = true;
+
+ }
+
+
+
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button8Click(TObject *Sender)
+{  //Закрытие окна
+
+	  if (Application->MessageBox("Несохраненные изменения могу быть утеряны. Вы уверенны, что все было сохранено? \n\n","Внимание!",MB_YESNO +MB_TOPMOST+ MB_ICONQUESTION)!=IDYES)
+	 {
+	   Abort();
+	 }
+	 else
+	 this->Close();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::Button9Click(TObject *Sender)
+{ //Очистка грида
+for (int i = 0; i < 35; i++)
+StringGrid2->Cells[1][i]= "";
+Button1->Enabled=false;
+}
+//---------------------------------------------------------------------------
+
+

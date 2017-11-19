@@ -1,0 +1,136 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+ #include "Unit1.h"
+#include "Unit4.h"
+
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma link "Chart"
+#pragma link "TeEngine"
+#pragma link "TeeProcs"
+#pragma link "Series"
+#pragma resource "*.dfm"
+TForm4 *Form4;
+//---------------------------------------------------------------------------
+__fastcall TForm4::TForm4(TComponent* Owner)
+	: TForm(Owner)
+{
+ 
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm4::Button1Click(TObject *Sender)
+{
+if (RadioButton1->Checked) {
+   Chart1->Series[0]->Clear();
+	Chart1->Series[1]->Clear();
+ for (int i = 1; i <= Form1->ADOTable1->RecordCount; i++) {
+
+ Form1->ADOTable1->RecNo = i;
+ Chart1->Series[0]->Add(Form1->ADOTable1->Fields->FieldByNumber(1)->AsInteger,Form1->ADOTable1->Fields->FieldByNumber(2)->AsString) ;
+}
+}
+ else   {
+  Chart1->Series[1]->Clear();
+   Chart1->Series[0]->Clear();
+ for (int i = 1; i <= Form1->ADOTable1->RecordCount; i++) {
+
+ Form1->ADOTable1->RecNo = i;
+ Chart1->Series[1]->Add(Form1->ADOTable1->Fields->FieldByNumber(1)->AsInteger,Form1->ADOTable1->Fields->FieldByNumber(2)->AsString) ;
+   }
+}
+}
+//---------------------------------------------------------------------------
+
+
+
+
+void __fastcall TForm4::Button2Click(TObject *Sender)
+{
+ ADOQuery1->Active = false;
+
+		ADOQuery1->SQL->Clear();
+		ADOQuery1->SQL->Add("SELECT [Основная информация].Фамилия, [Основная информация].Имя, [Основная информация].Отчество, [Основная информация].[Дата рождения], Факультет.[Название факультета]");
+		ADOQuery1->SQL->Add("FROM Факультет INNER JOIN (Кафедры INNER JOIN [Основная информация] ON Кафедры.[Код кафедры] = [Основная информация].Кафедра) ON Факультет.[Код факультета] = Кафедры.Факультет WHERE Факультет.[Название факультета] = :s1");
+		ADOQuery1->Parameters->ParamByName("s1")->Value = Form1->ADOTable1->Fields->FieldByNumber(2)->AsString;
+ ADOQuery1->Active = true;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::Button3Click(TObject *Sender)
+{
+
+  Chart1->Series[1]->Clear();
+  Chart1->Series[0]->Clear();
+
+ for (int i = 1; i <= Form1->ADOTable2->RecordCount; i++) {
+ Form1->ADOTable2->RecNo = i;
+ Chart1->Series[1]->Add(Form1->ADOTable2->Fields->FieldByNumber(5)->AsInteger,Form1->ADOTable2->Fields->FieldByNumber(1)->AsString + " " + Form1->ADOTable2->Fields->FieldByNumber(2)->AsString) ;
+   }
+
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::Button4Click(TObject *Sender)
+{
+this->Close();	
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::Button5Click(TObject *Sender)
+{
+ // Настройка диалога сохранения
+	SaveDialog1->Filter = "Текстовый файл (*.doc)|*.doc|Любой файл (*.*)|*.*";
+	SaveDialog1->DefaultExt = "doc";
+	SaveDialog1->InitialDir = "C:\\";
+ 
+	if (!SaveDialog1->Execute()) return; // вызов диалога сохранения
+ 
+	TStringList *List = new TStringList; // буфер строк под все строки таблицы
+	TStringList *Row = new TStringList; // буфер строк под 1 строку таблицы
+	Row->Delimiter = '\t'; // разделитель столбцов (таб)
+	Row->StrictDelimiter = true;
+ 
+	// Добавляем заголовок таблицы
+	for (int i=0; i<DBGrid2->DataSource->DataSet->FieldCount; i++)
+		Row->Add(DBGrid2->DataSource->DataSet->Fields->Fields[i]->DisplayLabel);
+	List->Add(Row->DelimitedText);
+ 
+	DBGrid2->DataSource->DataSet->First(); // переход к 1-й строке Датасета
+	DBGrid2->DataSource->DataSet->DisableControls(); // временно блокируем управление Датасетом
+	try {
+		// Пройдемся по строкам таблицы данных...
+		while (!DBGrid2->DataSource->DataSet->Eof) {
+			Row->Clear(); // очистка буфера под строку таблицы
+			for (int i=0; i<DBGrid2->DataSource->DataSet->FieldCount; i++)
+				// добавление след. поля данных из текущей строки
+				Row->Add(DBGrid2->DataSource->DataSet->Fields->Fields[i]->AsString);
+			List->Add(Row->DelimitedText); // добавление всей строки в общий буфер
+ 
+			DBGrid2->DataSource->DataSet->Next(); // переход к след. строке таблицы данных
+		}
+	}
+	__finally {
+		DBGrid2->DataSource->DataSet->First();
+		DBGrid2->DataSource->DataSet->EnableControls(); // снимаем блокировку
+	}
+ 
+	try {
+		List->SaveToFile(SaveDialog1->FileName); // сохранить буфер таблицы в файл
+	ShowMessage("Сохранено удачно!");
+	}
+	catch (...) {
+	ShowMessage("Ошибка!"); // при неудачном сохранении...
+	}
+ 
+	// очистка
+	delete Row;
+	delete List;
+}
+//---------------------------------------------------------------------------
+
